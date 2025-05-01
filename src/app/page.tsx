@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { api } from "~/trpc/react";
-import { useSession } from "next-auth/react";
+import { useSession, signOut, signIn } from "next-auth/react";
 import Image from "next/image";
 import {
   Dialog,
@@ -86,10 +86,10 @@ export default function Home() {
 
   if (!session) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#2e026d] to-[#15162c]">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#ff1493] to-[#ff69b4]">
         <div className="container flex flex-col items-center justify-center gap-12 px-4 py-16">
           <h1 className="text-5xl font-extrabold tracking-tight text-white sm:text-[5rem]">
-            Text<span className="text-[hsl(280,100%,70%)]">Heap</span>
+            Text<span className="text-[#ffc0cb]">Heap</span>
           </h1>
           <div className="flex flex-col items-center gap-2">
             <p className="text-2xl text-white">
@@ -99,6 +99,12 @@ export default function Home() {
               <p className="text-center text-lg text-white">
                 Sign in to start taking notes
               </p>
+              <button
+                onClick={() => void signIn()}
+                className="mt-4 rounded-md bg-white px-4 py-2 text-lg font-semibold text-[#ff1493] hover:bg-gray-100 transition-colors"
+              >
+                Sign in
+              </button>
             </div>
           </div>
         </div>
@@ -288,7 +294,7 @@ export default function Home() {
                     id="search"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="block w-full rounded-md border-0 py-1.5 pl-10 pr-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
+                    className="block w-full rounded-md border-0 py-1.5 pl-10 pr-3 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-[#ff1493] sm:text-sm sm:leading-6"
                     placeholder="Search notes..."
                   />
                 </div>
@@ -309,6 +315,12 @@ export default function Home() {
                   {session.user?.name}
                 </span>
               </span>
+              <button
+                onClick={() => void signOut()}
+                className="ml-2 rounded-md bg-gray-100 px-3 py-2 text-sm font-semibold text-gray-900 hover:bg-gray-200"
+              >
+                Sign out
+              </button>
             </div>
           </div>
         </div>
