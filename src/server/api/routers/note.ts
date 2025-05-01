@@ -172,4 +172,18 @@ export const noteRouter = createTRPCRouter({
       });
       return note;
     }),
+
+  delete: protectedProcedure
+    .input(z.object({
+      id: z.string(),
+    }))
+    .mutation(async ({ ctx, input }) => {
+      await ctx.db.note.delete({
+        where: {
+          id: input.id,
+          userId: ctx.session.user.id,
+        },
+      });
+      return { success: true };
+    }),
 }); 

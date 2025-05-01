@@ -11,9 +11,9 @@ export async function generateNoteName(content: string, attempt = 0): Promise<st
     
     // Different system prompts for each attempt to get varied results
     const systemPrompts = [
-      "You are a creative note naming assistant. Generate a concise, creative name (15-20 characters) for a note based on its content. Use popular memes to make the names funny. The name should be memorable and reflect the note's essence. Return only the name, nothing else.",
-      "You are a note naming assistant. Create a unique, descriptive name (15-20 characters) that captures the main topic or theme of the note. Focus on the key concepts. Return only the name, nothing else.",
-      "You are a note naming assistant. Generate a creative name (15-20 characters) using metaphors or analogies related to the note's content. Be imaginative but clear. Return only the name, nothing else."
+      "You are a concise note naming assistant. Generate a very short name (max 15 chars) for a note based on its content. The name must be memorable and reflect the note's essence. Return only the name, nothing else.",
+      "You are a note naming assistant. Create a unique, short name (max 15 chars) that captures the main topic. Focus on key concepts. Return only the name, nothing else.",
+      "You are a note naming assistant. Generate a creative name (max 15 chars) using metaphors related to the content. Be clear and concise. Return only the name, nothing else."
     ];
 
     const systemPrompt = systemPrompts[attempt % systemPrompts.length];
@@ -33,11 +33,15 @@ export async function generateNoteName(content: string, attempt = 0): Promise<st
           content: truncatedContent || "Empty note"
         }
       ],
-      max_tokens: 20,
+      max_tokens: 10,
       temperature: 0.7 + (attempt * 0.1), // Increase creativity with each attempt
     });
 
-    const generatedName = completion.choices[0]?.message?.content?.trim() ?? "Untitled Note";
+    let generatedName = completion.choices[0]?.message?.content?.trim() ?? "Untitled Note";
+    // Ensure the name is not longer than 15 characters
+    if (generatedName.length > 15) {
+      generatedName = generatedName.slice(0, 15).trim();
+    }
     return generatedName;
   } catch (error) {
     console.error("Error generating note name:", error);
