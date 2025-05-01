@@ -137,13 +137,13 @@ export default function Home() {
             <ul role="list" className="-mx-2 mt-2 space-y-1">
               {navigation.map((item) => (
                 <li key={item.id}>
-                  <button
+                  <div
                     onClick={() => setCurrentNoteId(item.id)}
                     className={classNames(
                       item.current
                         ? "bg-gray-800 text-white"
                         : "text-gray-400 hover:bg-gray-800 hover:text-white",
-                      "group flex w-full gap-x-3 rounded-md p-2 text-sm font-semibold leading-6"
+                      "group flex w-full gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 cursor-pointer"
                     )}
                   >
                     <item.icon className="h-6 w-6 shrink-0" aria-hidden="true" />
@@ -171,7 +171,7 @@ export default function Home() {
                         })}
                       </span>
                     </div>
-                  </button>
+                  </div>
                 </li>
               ))}
             </ul>
