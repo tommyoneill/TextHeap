@@ -31,19 +31,12 @@ export function NoteNavigation({ notes, currentNoteId, onNoteSelect }: NoteNavig
     return groups;
   }, {});
 
-  const getTitle = (note: Note) => {
+  const getPreview = (note: Note) => {
     const content = note.content.trim();
     if (content === "") return "Empty note";
     const firstLine = content.split("\n")[0] ?? "";
     return firstLine.slice(0, 30) + (firstLine.length > 30 ? "..." : "");
   };
-
-  const notePreviews: Record<string, string> = {};
-
-  notes.forEach((note) => {
-    const preview = note.content.split("\n")[0] ?? "New Note";
-    notePreviews[note.id] = preview;
-  });
 
   if (!isOpen) {
     return (
@@ -109,7 +102,10 @@ export function NoteNavigation({ notes, currentNoteId, onNoteSelect }: NoteNavig
                     }`}
                   >
                     <div className="text-sm font-medium text-gray-900">
-                      {getTitle(note)}
+                      {note.title}
+                    </div>
+                    <div className="mt-1 text-xs text-gray-600">
+                      {getPreview(note)}
                     </div>
                     <div className="mt-1 text-xs text-gray-500">
                       {format(note.createdAt, "h:mm a")}
