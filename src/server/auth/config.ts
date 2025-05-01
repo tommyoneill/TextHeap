@@ -54,5 +54,5 @@ export const authConfig = {
       },
     }),
   },
-  trustHost: env.NODE_ENV === "development",
+  trustHost: true,
 } satisfies NextAuthConfig;
