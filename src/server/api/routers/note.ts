@@ -65,8 +65,63 @@ export const noteRouter = createTRPCRouter({
     }))
     .output(noteOutput)
     .mutation(async ({ ctx, input }) => {
-      // Generate a new title if content has changed
-      const title = await generateNoteName(input.content);
+      // First get the current note to check its title
+      const currentNote = await ctx.db.note.findUnique({
+        where: {
+          id: input.id,
+          userId: ctx.session.user.id,
+        },
+        select: noteSelect,
+      });
+
+      if (!currentNote) {
+        throw new Error("Note not found");
+      }
+
+      // Only generate a new title if:
+      // 1. The note has default title ("New Note" or "Untitled Note")
+      // 2. The content is substantial enough (at least 20 chars)
+      // 3. The content has changed
+      const hasDefaultTitle = currentNote.title === "New Note" || currentNote.title === "Untitled Note";
+      const hasSubstantialContent = input.content.trim().length >= 20;
+      const contentChanged = currentNote.content !== input.content;
+
+      let title = currentNote.title;
+      if (hasDefaultTitle && hasSubstantialContent && contentChanged) {
+        // Get all existing titles for this user
+        const existingTitles = new Set((await ctx.db.note.findMany({
+          where: {
+            userId: ctx.session.user.id,
+            NOT: {
+              id: input.id // Exclude current note
+            }
+          },
+          select: { title: true }
+        })).map((note: { title: string }) => note.title));
+
+        // Try to generate a unique title, with a maximum of 3 attempts
+        let attempts = 0;
+        let newTitle: string;
+        do {
+          newTitle = await generateNoteName(input.content, attempts);
+          attempts++;
+        } while (existingTitles.has(newTitle) && attempts < 3);
+
+        // If we found a unique title, use it
+        if (!existingTitles.has(newTitle)) {
+          title = newTitle;
+        }
+        // If all attempts resulted in duplicates, append a number to make it unique
+        else {
+          let counter = 1;
+          const baseTitle = newTitle;
+          while (existingTitles.has(newTitle)) {
+            newTitle = `${baseTitle} ${counter}`;
+            counter++;
+          }
+          title = newTitle;
+        }
+      }
 
       const note = await ctx.db.note.update({
         where: {
